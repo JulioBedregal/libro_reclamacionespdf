@@ -10,88 +10,6 @@
     //libreria FPDF
     require('fpdf/fpdf.php');
 
-    class PDF extends FPDF
-    {
-        private $empresa;
-        private $ruc;
-        private $direccion;
-    
-        // Establecer los valores para la empresa, RUC y dirección
-        function setDatosEmpresa($empresa, $ruc, $direccion)
-        {
-            $this->empresa = $empresa;
-            $this->ruc = $ruc;
-            $this->direccion = $direccion;
-        }
-
-        function Header()
-        {
-            // Mostrar el logo al lado del nombre de la empresa
-            // $this->Image('import.png', 10, 6, 15, 15);  // Logo (20mm de ancho, 20mm de alto)
-            // $this->SetX(30);  // Desplazamos a la derecha para escribir el nombre de la empresa
-    
-            // // Título de la empresa (al lado del logo)
-            // $this->SetFont('Arial', 'I', 14);
-            // $this->Cell(0, 8, utf8_decode($this->empresa), 0, 1, 'L');
-            // $this->Ln(8);
-    
-            // // Datos adicionales al lado del logo
-            // $this->SetFont('Arial', 'I', 10);
-            // $this->Cell(0, 4, utf8_decode('RUC: ' . $this->ruc), 0, 1, 'L');
-            // $this->Cell(0, 4, utf8_decode('Razón Social: ' . $this->empresa), 0, 1, 'L');
-            // $this->Cell(0, 4, utf8_decode('Dirección: ' . $this->direccion), 0, 1, 'L');
-            $this->Image('import.png', 10, 6, 15, 15);  // Logo (20mm de ancho, 20mm de alto)
-            $this->SetX(30);  // Desplazamos a la derecha para escribir el nombre de la empresa
-            
-            // Título de la empresa (al lado del logo)
-            $this->SetFont('Arial', 'I', 14);
-            $this->Cell(0, 8, utf8_decode('IMPORT HERMOZA S.A.C'), 0, 1, 'L');
-            $this->Ln(8);
-    
-            // Datos adicionales al lado del logo
-            $this->SetFont('Arial', 'I', 10);
-            $this->Cell(0, 4, utf8_decode('RUC: 20605259091'), 0, 1, 'L');
-            $this->Cell(0, 4, utf8_decode('Razón Social: IMPORT HERMOZA S.A.C.'), 0, 1, 'L');
-            $this->Cell(0, 4, utf8_decode('Dirección: Av. Parra Nro. 407( Frente Alicorp) - Arequipa'), 0, 1, 'L');
-            $this->Ln(5);  // Espacio después de los datos
-    
-            // Título del libro de reclamaciones
-            $this->SetFont('Arial', 'B', 18);
-            $this->Cell(0, 10, utf8_decode('LIBRO DE RECLAMACIONES'), 0, 1, 'C');  // Centrado
-            $this->Ln(5);
-        }
-
-        function Footer()
-        {
-            $this->SetY(-15);
-            $this->SetFont('Arial', 'I', 8);
-            $this->Cell(0, 10, utf8_decode('Página ') . $this->PageNo() . utf8_decode(' | IMPORT HERMOZA SAC | Dirección: Av. Parra Nro. 407( Frente Alicorp)'), 0, 0, 'C');
-        }
-
-        function ChapterTitle($label)
-        {
-            $this->SetFont('Arial', 'B', 10);
-            $this->Cell(0, 10, utf8_decode("$label"), 1, 1, 'C', true);
-            $this->Ln(3);
-        }
-
-        function ChapterBody($label, $content)
-        {
-            $this->SetFont('Arial', 'B', 10);
-            $this->Cell(60, 8, utf8_decode("$label:"), 1, 0, 'L');
-            $this->SetFont('Arial', '', 10);
-            $this->Cell(0, 8, utf8_decode("$content"), 1, 1);
-            $this->Ln(3);
-        }
-
-        function ChapterText($content)
-        {
-            $this->SetFont('Arial', '', 10);
-            $this->MultiCell(0, 8, utf8_decode("$content"), 1, 1);
-            $this->Ln(3);
-        }
-    }
-
     if(isset($_POST['submit'])){
         $nombres = $_POST['nombres'];
         $apellidos = $_POST['apellidos'];
@@ -148,43 +66,58 @@
             // Confirmar inserción exitosa
             if ($stmt->rowCount() > 0) {
                 // Generar el PDF con los datos del reclamo
-                $pdf = new PDF();
+                $pdf = new FPDF();
                 $pdf->AddPage();
-                //$pdf->SetFont('Arial', 'B', 16);
-                //$pdf->Cell(0, 10, 'Confirmación de Reclamo', 0, 1, 'C');
-                $pdf->SetMargins(10, 10, 10);
-                $pdf->SetFillColor(220, 220, 220);
+                $pdf->SetFont('Arial', 'B', 16);
+                $pdf->Cell(0, 10, 'Confirmación de Reclamo', 0, 1, 'C');
+                $pdf->Ln(10);
 
-                $empresa = "IMPORT HERMOZA S.A.C";
-                $ruc = "20605259091";
-                $direccion = "Av. Parra Nro. 407( Frente Alicorp) - Arequipa";
-                $pdf->setDatosEmpresa($empresa, $ruc, $direccion);
-                
+                // Datos personales
+                $pdf->SetFont('Arial', 'B', 12);
+                $pdf->Cell(0, 10, 'Datos Personales:', 0, 1);
+                $pdf->SetFont('Arial', '', 11);
+                $pdf->Cell(50, 10, 'Nombre Completo:', 0, 0);
+                $pdf->Cell(100, 10, utf8_decode("$nombres $apellidos"), 0, 1);
+                $pdf->Cell(50, 10, 'Tipo de Documento:', 0, 0);
+                $pdf->Cell(100, 10, utf8_decode("$tipo_documento - $numero_documento"), 0, 1);
+                $pdf->Cell(50, 10, utf8_decode('Teléfono:'), 0, 0);
+                $pdf->Cell(100, 10, $telefono, 0, 1);
+                $pdf->Cell(50, 10, utf8_decode('Correo Electrónico:'), 0, 0);
+                $pdf->Cell(100, 10, $correo, 0, 1);
+                $pdf->Cell(50, 10, 'Dirección:', 0, 0);
+                $pdf->MultiCell(0, 10, utf8_decode($direccion), 0, 1);
+                $pdf->Ln(5);
 
-                // Datos del usuario
-                $pdf->ChapterTitle('DATOS DEL USUARIO');
-                $pdf->ChapterBody("Nombre Completo", "$nombres $apellidos");
-                $pdf->ChapterBody("Domicilio", $direccion);
-                $pdf->ChapterBody("Tipo de Documento", "$tipo_documento N° $numero_documento");
-                $pdf->ChapterBody("Teléfono", $telefono);
-                $pdf->ChapterBody("Email", $correo);
+                // Detalles del Reclamo
+                $pdf->SetFont('Arial', 'B', 12);
+                $pdf->Cell(0, 10, 'Detalles del Reclamo:', 0, 1);
+                $pdf->SetFont('Arial', '', 11);
+                $pdf->Cell(50, 10, utf8_decode('Código de Reclamo:'), 0, 0);
+                $pdf->Cell(100, 10, $codigo_reclamo, 0, 1);
+                $pdf->Cell(50, 10, 'Sucursal:', 0, 0);
+                $pdf->Cell(100, 10, utf8_decode($sucursal), 0, 1);
+                $pdf->Cell(50, 10, 'Tipo de Bien:', 0, 0);
+                $pdf->Cell(100, 10, utf8_decode($tipo_bien), 0, 1);
+                $pdf->Cell(50, 10, 'Monto:', 0, 0);
+                $pdf->Cell(100, 10, "S/ " . number_format($monto, 2), 0, 1);
+                $pdf->Ln(5);
 
-                // Detalles del reclamo
-                $pdf->ChapterTitle('DETALLES DEL RECLAMO');
-                $pdf->ChapterBody("Código de Reclamo", $codigo_reclamo);
-                $pdf->ChapterBody("Sucursal", $sucursal);
-                $pdf->ChapterBody("Tipo de Bien", $tipo_bien);
-                $pdf->ChapterBody("Monto", "S/ " . number_format($monto, 2));
-                $pdf->ChapterBody("Descripción", $descripcion);
+                $pdf->SetFont('Arial', 'B', 12);
+                $pdf->Cell(0, 10, utf8_decode('Descripción del Reclamo:'), 0, 1);
+                $pdf->MultiCell(0, 10, utf8_decode($descripcion), 0, 1);
+                $pdf->Ln(5);
 
-                // Detalles adicionales
-                $pdf->ChapterTitle('DETALLES ADICIONALES');
-                $pdf->ChapterBody("Tipo de Reclamo", $tipo_reclamo);
-                $pdf->ChapterBody("Detalle del Producto", $detalle_producto);
-                $pdf->ChapterBody("Número de Pedido", $pedido);
+                $pdf->Cell(50, 10, 'Tipo de Reclamo:', 0, 0);
+                $pdf->Cell(100, 10, utf8_decode($tipo_reclamo), 0, 1);
+                $pdf->Cell(50, 10, 'Detalle del Producto:', 0, 0);
+                $pdf->MultiCell(0, 10, utf8_decode($detalle_producto), 0, 1);
+                $pdf->Cell(50, 10, utf8_decode('Número de Pedido:'), 0, 0);
+                $pdf->Cell(100, 10, utf8_decode($pedido), 0, 1);
+                $pdf->Ln(10);
 
-                // Mensaje final
-                $pdf->ChapterText("Gracias por comunicarse con nosotros. Atenderemos su solicitud a la brevedad posible.");
+                $pdf->SetFont('Arial', 'I', 10);
+                $pdf->MultiCell(0, 10, utf8_decode("Gracias por comunicarse con nosotros. Atenderemos su solicitud a la brevedad posible."), 0, 'C');
+                //$pdf->Output($pdf_file, 'F');
 
                 $pdf_file = "tmp/reclamo_$codigo_reclamo.pdf";
                 $pdf->Output($pdf_file, 'F');
@@ -205,8 +138,8 @@
                     
                     //Configuracion del correo
                     $mail->setFrom('cuentita.pruebitas@gmail.com'); //desde que correo se envia
-                    //$mail->addAddress($correo); //correo de contacto a que correo llegara
-                    $mail->addAddress("jotace.techs@gmail.com"); //correo de contacto a que correo llegara
+                    $mail->addAddress($correo); //correo de contacto a que correo llegara
+                    //$mail->addAddress("jotace.techs@gmail.com"); //correo de contacto a que correo llegara
                     
                     $mail->addAttachment($pdf_file); 
 
