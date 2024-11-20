@@ -1,4 +1,5 @@
 <?php
+
     include "conexion/bd.php";
     //libreria PHPMailer
     use PHPMailer\PHPMailer\{PHPMailer,SMTP, Exception};

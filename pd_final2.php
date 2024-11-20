@@ -12,7 +12,7 @@ class PDF extends FPDF
         // Título de la empresa (al lado del logo)
         $this->SetFont('Arial', 'I', 14);
         $this->Cell(0, 8, utf8_decode('IMPORT HERMOZA S.A.C'), 0, 1, 'L');
-        $this->Ln(8);
+        $this->Ln(6);
 
         // Datos adicionales al lado del logo
         $this->SetFont('Arial', 'I', 10);
@@ -101,7 +101,7 @@ $pdf->ChapterBody("Reclamo", "Queja");
 $pdf->ChapterTitle('IDENTIFICACIÓN DE LA ATENCIÓN BRINDADA');
 $pdf->ChapterBody("Detalle del Producto/Servicio", "Compra de televisor LED 55 pulgadas");
 $pdf->ChapterBody("Monto", "S/ 2,500.00");
-$pdf->ChapterBody("Sucursal", "Sucursal Miraflores");
+$pdf->ChapterBody("Sucursal", "Miraflores");
 $pdf->ChapterBody("Descripción", "El televisor presenta problemas en la imagen después de 3 días de uso.");
 
 $pdf->ChapterTitle('ACCIONES ADOPTADAS');
